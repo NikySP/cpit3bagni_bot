@@ -4,30 +4,28 @@ import time
 import schedule
 from telegram.ext import Updater, CommandHandler
 import os
-from datetime import datetime
 
 TOKEN = os.getenv("TOKEN")
-GROUPID = os.getenv("GROUPID")
+GROUP_ID = os.getenv("GROUPID")
 updater = Updater(TOKEN)
 WEBHOOK = os.getenv("WEBHOOK")
 MESSAGE = os.getenv("MESSAGE")
 PORT = int(os.environ.get('PORT', '8443'))
 SCHEDULED_MESSAGE= os.getenv("SCHEDULED_MESSAGE")
-PORT = int(os.environ.get('PORT', '8443'))
 TRIGGER_TIME = os.getenv("TRIGGER_TIME")
 ENABLE_GM = os.getenv("ENABLE_GM")
+BASE_URL = "https://api.telegram.org/bot{0}/sendMessage?chat_id={1}&parse_mode=Markdown&text={2}"
 
 
 def bagni(bot, update):
     chat_id = update.message.chat_id
     print(chat_id)
-    bot.send_message(chat_id=chat_id, text=MESSAGE)
+    bot.send_message(chat_id=chat_id, text="")
 
 
 def sendGoodMorning():
-    bot_chatID = GROUPID
-    send_text = 'https://api.telegram.org/bot' + TOKEN + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + SCHEDULED_MESSAGE
-    response = requests.get(send_text)
+    sendText = BASE_URL.format(TOKEN, GROUP_ID, SCHEDULED_MESSAGE)
+    response = requests.get(sendText)
     return response.json()
 
 
@@ -37,7 +35,8 @@ def loopGoodMorning():
         schedule.run_pending()
         time.sleep(1)
 
-if ENABLE_GM=="y":
+
+if ENABLE_GM == "y":
     t = threading.Thread(target=loopGoodMorning)
     t.daemon = True
     t.start()
